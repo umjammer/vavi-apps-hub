@@ -30,12 +30,16 @@ public class Main {
             ResourceConfig config = new ResourceConfig().packages("vavi.apps.hub.jersey");
 
             server = JettyHttpContainerFactory.createServer(
-                    URI.create("http://localhost:8080/"), config);
+                    URI.create("http://localhost:60080/"), config); // TODO ssl
 
-            ServletContextHandler handler = new ServletContextHandler(server, "/hub");
-            server.setHandler(handler);
+            // TODO cannot coexists
+//            ServletContextHandler handler = new ServletContextHandler(server, "/hub");
+//            server.setHandler(handler);
+//
+//            JakartaWebSocketServletContainerInitializer.configure(handler, null);
+//
+//            server.setHandler(handler);
 
-            JakartaWebSocketServletContainerInitializer.configure(handler, null);
 
             server.start();
             server.join();
