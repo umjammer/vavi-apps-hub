@@ -10,7 +10,6 @@
   <properties>
     <javapackager.name>Hub</javapackager.name>
     <javapackager.assetsDir>src/main/package</javapackager.assetsDir>
-    <rococoa.version>0.8.5</rococoa.version>
   </properties>
 
   <profiles>
@@ -51,7 +50,7 @@
           <plugin>
             <groupId>io.github.fvarrui</groupId>
             <artifactId>javapackager</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.5</version>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -71,7 +70,7 @@
                   <assetsDir>${javapackager.assetsDir}</assetsDir>
 
                   <additionalResources>
-                    <additionalResource>${project.build.outputDirectory}/logging.properties</additionalResource>
+                    <additionalResource>${project.build.testResources[0].directory}/logging.properties</additionalResource>
                     <additionalResource>${project.build.testOutputDirectory}/librococoa.dylib</additionalResource>
                   </additionalResources>
 
@@ -104,33 +103,6 @@
               </execution>
             </executions>
           </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.3.0</version>
-            <executions>
-              <execution>
-                <id>copy</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>copy</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.rococoa</groupId>
-                      <artifactId>rococoa-core</artifactId>
-                      <type>dylib</type>
-                      <overWrite>false</overWrite>
-                      <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                      <destFileName>librococoa.dylib</destFileName>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -141,16 +113,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.11.0</version>
         <configuration>
-          <source>17</source>
-          <target>17</target>
+          <release>17</release>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M7</version>
+        <version>3.2.2</version>
         <configuration>
           <argLine>
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
@@ -166,10 +137,6 @@
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
-    <repository>
-      <id>github</id>
-      <url>https://maven.pkg.github.com/umjammer/*</url>
-    </repository>
   </repositories>
 
   <dependencyManagement>
@@ -177,14 +144,14 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.9.3</version>
+        <version>5.10.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -195,50 +162,76 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.9</version>
+      <version>1.1.10</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.umjammer.rococoa</groupId> <!-- org.rococoa / com.github.umjammer.rococoa -->
+      <artifactId>rococoa-contrib</artifactId>
+      <version>0.8.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.umjammer</groupId>
+      <artifactId>hid4java</artifactId>
+      <version>0.14.8v</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+
+    <!-- web socket -->
     <dependency>
       <groupId>jakarta.websocket</groupId>
       <artifactId>jakarta.websocket-api</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.1</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-jakarta-server</artifactId>
-      <version>11.0.15</version>
+      <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+      <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+      <version>12.0.3</version>
     </dependency>
 
+    <!-- rest -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-jetty-http</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-jetty-servlet</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-activation</artifactId>
+      <version>2.0.2</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <dependency>
-      <groupId>vavi</groupId>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>3.3</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-script-apple</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.rococoa</groupId>
-      <artifactId>rococoa-core</artifactId>
-      <version>${rococoa.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.rococoa</groupId>
-      <artifactId>rococoa-contrib</artifactId>
-      <version>${rococoa.version}</version>
+      <version>1.2.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <version>2.0.3</version>
+      <version>2.0.11</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
@@ -259,6 +252,19 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sshtools</groupId>
+      <artifactId>two-slices</artifactId>
+      <version>0.9.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.dorkbox</groupId>
+      <artifactId>SystemTray</artifactId>
+      <version>4.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
