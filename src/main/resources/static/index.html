@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>vavi-apps-hub</title>
+</head>
+<body>
+<canvas id="canvasArea" width="700" height="1444" style="background: yellow"></canvas>
+<script>
+    var canvasArea = document.querySelector("#canvasArea");
+    var context = canvasArea.getContext('2d');
+    context.fillStyle = "rgba(255,0,0,255)";
+
+    var ws;
+    function start() {
+        ws = new WebSocket('ws://localhost:60080/ws/pointing');
+        ws.onmessage = function(event) {
+            var d = JSON.parse(event.data);
+            context.fillRect(d["mx"], d["my"], 3, 3);
+        };
+    };
+    start();
+
+    document.addEventListener("mousemove", function(e) {
+        ws.send(JSON.stringify({
+            "message": "mousemove",
+            "mx": e.clientX,
+            "my": e.clientY
+        }));
+    });
+
+    canvasArea.addEventListener("click", function(e) {
+        if (ws.readyState != 1) {
+            start();
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
  * Programmed by Naohide Sano
  */
 
-package vavi.apps.hub;
+package vavi.apps.hub.ws;
 
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
@@ -12,6 +12,10 @@ import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
+import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException;
+import vavi.apps.hub.ws.JsonCodec.JsonDecoder;
+import vavi.apps.hub.ws.JsonCodec.JsonEncoder;
+import vavi.util.Debug;
 
 
 /**
@@ -20,27 +24,33 @@ import jakarta.websocket.server.ServerEndpoint;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-05-10 nsano initial version <br>
  */
-@ServerEndpoint("/pointing")
+@ServerEndpoint(value = "/ws/pointing",
+        decoders = JsonDecoder.class,
+        encoders = JsonEncoder.class)
 public class RemotePointingServer {
 
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("onOpen");
+Debug.println("onOpen");
     }
 
     @OnMessage
-    public String onMessage(String message) {
-        System.out.println("onMessage " + message);
-        return "You said \"" + message + "\".";
+    public ClientData onMessage(ClientData data) {
+Debug.println("onMessage " + data.message + ": " + data.mx + ", " + data.my);
+        return data;
     }
 
     @OnError
     public void onError(Throwable t) {
-        t.printStackTrace();
+        if (t instanceof WebSocketTimeoutException) {
+Debug.println(t.getMessage());
+        } else {
+Debug.printStackTrace(t);
+        }
     }
 
     @OnClose
     public void onClose(Session session) {
-        System.out.println("onClose");
+Debug.println("onClose");
     }
 }

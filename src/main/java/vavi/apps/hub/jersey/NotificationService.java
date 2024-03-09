@@ -29,7 +29,9 @@ public class NotificationService {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("notify")
-    public void say(@QueryParam("message") String message, @QueryParam("title") String title, @QueryParam("from") String from) {
+    public void say(@QueryParam("message") String message,
+                    @QueryParam("title") String title,
+                    @QueryParam("from") String from) {
         try {
 Debug.println("message " + message);
             String subTitle = "From: " + from;

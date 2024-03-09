@@ -9,7 +9,7 @@ package vavi.apps.hub;
 import org.junit.jupiter.api.Test;
 
 
-class Test1 {
+class TestCase {
 
     @Test
     //@EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
@@ -17,5 +17,3 @@ class Test1 {
         System.err.println("Hello World!");
     }
 }
-
-/* */

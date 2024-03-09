@@ -71,7 +71,6 @@
 
                   <additionalResources>
                     <additionalResource>${project.build.testResources[0].directory}/logging.properties</additionalResource>
-                    <additionalResource>${project.build.testOutputDirectory}/librococoa.dylib</additionalResource>
                   </additionalResources>
 
                   <vmArgs>
