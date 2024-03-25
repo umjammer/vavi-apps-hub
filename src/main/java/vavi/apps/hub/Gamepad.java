@@ -7,12 +7,14 @@
 package vavi.apps.hub;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
-import net.java.games.input.Event;
-import net.java.games.input.WrappedComponent;
 import net.java.games.input.usb.HidController;
-import net.java.games.input.usb.parser.Field;
 import vavi.games.input.hid4java.spi.Hid4JavaEnvironmentPlugin;
+import vavi.games.input.listener.GamepadInputEventListener;
+import vavi.util.Debug;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
 
 
 /**
@@ -21,19 +23,43 @@ import vavi.games.input.hid4java.spi.Hid4JavaEnvironmentPlugin;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2024-03-06 nsano initial version <br>
  */
-public class Gamepad {
+@PropsEntity(url = "file:local.properties")
+public class Gamepad implements Plugin {
 
-    public void init() throws IOException {
-        int vendorId = 0x54c;
-        int productId = 0x9cc;
-        Hid4JavaEnvironmentPlugin environment = new Hid4JavaEnvironmentPlugin();
-        HidController controller = environment.getController(vendorId, productId);
-        controller.addInputEventListener(e -> {
-            Event event = new Event();
-            while (e.getNextEvent(event)) {
-                Field field = ((WrappedComponent<Field>) event.getComponent()).getWrappedObject();
-            }
-        });
-        controller.open();
+    static {
+        System.setProperty("net.java.games.input.InputEvent.fillAll", "true");
+
+        System.setProperty("vavi.games.input.listener.period", "100");
+        System.setProperty("vavi.games.input.listener.warmup", "500");
+    }
+
+    @Property(name = "mid")
+    String mid;
+    @Property(name = "pid")
+    String pid;
+
+    int vendorId;
+    int productId;
+
+    @Override
+    public void init(Context context) {
+        try {
+            PropsEntity.Util.bind(this);
+
+            vendorId = Integer.decode(mid);
+            productId = Integer.decode(pid);
+
+            Hid4JavaEnvironmentPlugin environment = new Hid4JavaEnvironmentPlugin();
+            HidController controller = environment.getController(vendorId, productId);
+Debug.println(Level.INFO, controller);
+
+            GamepadInputEventListener listener = new GamepadInputEventListener();
+            listener.addObserver(context::fireEventHappened);
+            controller.addInputEventListener(listener);
+
+            controller.open();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

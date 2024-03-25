@@ -43,6 +43,7 @@ Debug.println("message " + message);
                     "display notification \"%s\" with title \"%s\" subtitle \"%s\" sound name \"%s\"",
                     message, title, subTitle, sound);
             Object r = engine.eval(script);
+Debug.println("script: " + script);
 Debug.println("result: " + r);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
