@@ -70,7 +70,9 @@
                   <assetsDir>${javapackager.assetsDir}</assetsDir>
 
                   <additionalResources>
-                    <additionalResource>${project.build.testResources[0].directory}/logging.properties</additionalResource>
+                    <additionalResource>${project.build.resources[0].directory}/logging.properties</additionalResource>
+                    <additionalResource>${project.build.resources[0].directory}/static</additionalResource>
+                    <additionalResource>local.properties</additionalResource>
                   </additionalResources>
 
                   <vmArgs>
@@ -154,6 +156,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>12.0.7</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -161,19 +170,13 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.10</version>
+      <version>1.1.11</version>
     </dependency>
 
     <dependency>
-      <groupId>com.github.umjammer.rococoa</groupId> <!-- org.rococoa / com.github.umjammer.rococoa -->
-      <artifactId>rococoa-contrib</artifactId>
-      <version>0.8.7</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.umjammer</groupId>
-      <artifactId>hid4java</artifactId>
-      <version>0.14.8v</version>
+      <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
+      <artifactId>vavi-awt-joystick</artifactId>
+      <version>0.0.7</version>
     </dependency>
 
     <dependency>
@@ -191,13 +194,27 @@
     <dependency>
       <groupId>org.eclipse.jetty.ee10.websocket</groupId>
       <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
-      <version>12.0.3</version>
+      <version>12.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId> <!-- even patch version update, jetty changes api -->
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId> <!-- even patch version update, jetty changes api -->
     </dependency>
 
     <!-- rest -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-jetty-http</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-server</artifactId> <!-- even patch version update, jetty changes api -->
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
@@ -225,6 +242,12 @@
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-script-apple</artifactId>
       <version>1.2.2</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>rococoa-cocoa</artifactId>
+          <groupId>com.github.umjammer.rococoa</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

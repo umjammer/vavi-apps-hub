@@ -5,15 +5,46 @@
 
 # vavi-apps-hub
 
-<img src="https://github.com/umjammer/vavi-apps-hub/assets/493908/5efff428-15df-46bb-a7b0-929e31caf3c2" width="128" alt="hub logo" /><sub><a href="https://www.silhouette-illust.com/illust/49214">© silhouette illust</a></sub>
+<img src="https://github.com/umjammer/vavi-apps-hub/assets/493908/5efff428-15df-46bb-a7b0-929e31caf3c2" width="128" alt="hub logo" />
 
 My Hub ❤
 
+### plugins
+
+ * remote notificator
+ * remote trackpad (wip)
+ * gamepad binder
+ * hand gesture recognizer (tbd)
+
 ## Install
 
- 1. `$ git clone https://github.com/umjammer/vavi-apps-hub`
- 2. `$ mvn package`
- 3. `$ cp target/Hub/Hub.app` ~/Application 
+ * [maven](https://jitpack.io/#umjammer/vavi-apps-hub)
+
+## Usage
+
+### server
+
+```shell
+ $ git clone https://github.com/umjammer/vavi-apps-hub
+ $ mvn package
+ $ open -a target/Hub/Hub.app
+```
+
+### client
+
+#### notificator
+
+```shell
+ curl "http://your_destination:60080/notification/notify?message=your_message&title=your_title&from=your_source" 
+```
+
+#### remote trackpad
+
+ * accsess `http://localhost:60080/`
+
+#### gamepad binder
+
+* let Minecraft or MuseScore3 most front
 
 ## References
 
@@ -34,4 +65,7 @@ My Hub ❤
  * ~~hub for notification center over inet~~
  * hub for remote mouse input (wip) -> this websocket server
  * ~~apple remote event?~~ -> this rest server
- * ~~coexistence websocket and jersey on jetty~~ see [Main.java](src/main/java/vavi/apps/hub/Main.java) 
+ * ~~coexistence websocket and jersey on jetty~~ see [Main.java](src/main/java/vavi/apps/hub/Main.java)
+
+---
+<sub>image by <a href="https://www.silhouette-illust.com/illust/49214">silhouette illust</a></sub>
