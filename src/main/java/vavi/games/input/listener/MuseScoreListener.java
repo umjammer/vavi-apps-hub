@@ -26,7 +26,7 @@ import static org.rococoa.carbon.CarbonCoreLibrary.kVK_Command;
  */
 public class MuseScoreListener extends GamepadAdapter {
 
-    RococaRobot robot = new RococaRobot();
+    final RococaRobot robot = new RococaRobot();
 
     long prev = System.currentTimeMillis();
 

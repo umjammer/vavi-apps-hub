@@ -6,7 +6,6 @@
 
 import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
-import com.sshtools.twoslices.ToasterSettings;
 
 
 /**
