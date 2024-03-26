@@ -7,13 +7,13 @@
 
 <img src="https://github.com/umjammer/vavi-apps-hub/assets/493908/5efff428-15df-46bb-a7b0-929e31caf3c2" width="128" alt="hub logo" />
 
-My Hub ❤
+🌐 hub for plugins that controls a computer 
 
 ### plugins
 
  * remote notificator
  * remote trackpad (wip)
- * gamepad binder
+ * 🏅 gamepad binder (Minecraft, MuseScore3)
  * hand gesture recognizer (tbd)
 
 ## Install
@@ -63,9 +63,11 @@ My Hub ❤
 ## TODO
 
  * ~~hub for notification center over inet~~
- * hub for remote mouse input (wip) -> this websocket server
- * ~~apple remote event?~~ -> this rest server
+ * ~~hub for remote mouse input~~ -> this websocket server (done)
+   * touchpad (wip)
+ * ~~apple remote event?~~ -> this rest server (done)
  * ~~coexistence websocket and jersey on jetty~~ see [Main.java](src/main/java/vavi/apps/hub/Main.java)
+ * gamepad configuration, dsl?, json?
 
 ---
 <sub>image by <a href="https://www.silhouette-illust.com/illust/49214">silhouette illust</a></sub>
