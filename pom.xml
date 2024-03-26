@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -176,7 +176,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.7</version>
+      <version>0.0.8</version>
     </dependency>
 
     <dependency>

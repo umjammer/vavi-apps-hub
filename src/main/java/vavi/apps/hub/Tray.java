@@ -30,8 +30,10 @@ public class Tray implements Plugin {
     /** */
     private PopupMenu popup;
 
+    /** TODO generated automatically? */
     MenuItem gamepadItem;
 
+    /** TODO location should be at gamepad plugin */
     void gamepad(GenericEvent event) {
         if (gamepadItem == null) {
             gamepadItem = new MenuItem();

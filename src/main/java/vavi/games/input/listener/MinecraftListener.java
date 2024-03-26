@@ -11,23 +11,16 @@ import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
-import com.sun.jna.platform.mac.CoreFoundation.CFArrayRef;
-import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.attach.VirtualMachineDescriptor;
 import net.java.games.input.Event;
-import org.rococoa.Rococoa;
-import org.rococoa.cocoa.appkit.NSRunningApplication;
-import org.rococoa.cocoa.coregraphics.RococaRobot;
-import org.rococoa.cocoa.foundation.NSDictionary;
-import org.rococoa.cocoa.foundation.NSString;
+import vavi.games.input.listener.GamepadInputEventListener.AppInfo;
 import vavi.games.input.listener.GamepadInputEventListener.Context;
+import vavi.games.input.robot.Key;
+import vavi.games.input.robot.RococaRobot;
 import vavi.util.Debug;
 import vavi.util.event.GenericEvent;
 
@@ -51,9 +44,7 @@ import static org.rococoa.carbon.CarbonCoreLibrary.kVK_Shift;
 import static org.rococoa.carbon.CarbonCoreLibrary.kVK_Space;
 import static org.rococoa.cocoa.coregraphics.CoreGraphicsLibrary.kCGMouseButtonLeft;
 import static org.rococoa.cocoa.coregraphics.CoreGraphicsLibrary.kCGMouseButtonRight;
-import static org.rococoa.cocoa.coregraphics.CoreGraphicsLibrary.kCGNullWindowID;
-import static org.rococoa.cocoa.coregraphics.CoreGraphicsLibrary.kCGWindowListOptionOnScreenOnly;
-import static org.rococoa.cocoa.coregraphics.CoreGraphicsLibrary.library;
+import static vavi.games.input.helper.JavaVMAppInfo.getPidByMainClassName;
 
 
 /**
@@ -66,49 +57,6 @@ public class MinecraftListener extends GamepadAdapter {
 
     private static final String bundleId = "com.mojang.Minecraft";
 
-    private long prevForBounds;
-
-    @Override
-    public boolean match(NSRunningApplication a) {
-        try {
-            if (a.processIdentifier().intValue() == getMcLauncherPid()) {
-                if (System.currentTimeMillis() - prevForBounds > 20 * 1000) {
-                    prevForBounds = System.currentTimeMillis();
-                    Executors.newSingleThreadScheduledExecutor().submit(() -> retrieveBounds(a));
-                }
-                return true;
-            }
-        } catch (NoSuchElementException e) {
-//Debug.println(e.getMessage());
-        }
-        return false;
-    }
-
-    /** @after {@link #bounds} */
-    private void retrieveBounds(NSRunningApplication a) {
-        CFArrayRef array = library.CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-//Debug.println("windows: " + array.getCount());
-        for (int i = 0; i < array.getCount(); i++) {
-            NSDictionary dic = Rococoa.toNSDictionary(array.getValueAtIndex(i));
-            if (Integer.parseInt(dic.get(NSString.stringWithString("kCGWindowOwnerPID")).toString()) == a.processIdentifier().intValue()) {
-                NSDictionary rect = Rococoa.cast(dic.get(NSString.stringWithString("kCGWindowBounds")), NSDictionary.class);
-                int x = Integer.parseInt(rect.get(NSString.stringWithString("X")).toString());
-                int y = Integer.parseInt(rect.get(NSString.stringWithString("Y")).toString());
-                int width = Integer.parseInt(rect.get(NSString.stringWithString("Width")).toString());
-                int height = Integer.parseInt(rect.get(NSString.stringWithString("Height")).toString());
-                Rectangle r = bounds.get();
-                if (r == null) {
-                    bounds.set(new Rectangle(x, y, width, height));
-                } else {
-                    r.setBounds(x, y, width, height);
-                }
-//Debug.println("minecraft window found: " + r);
-                return;
-            }
-        }
-//Debug.println("no minecraft window found.");
-    }
-
     /** minecraft launchers descriptor#dusplayName */
     private static final String[] mcLaunchers = {
             "net.minecraft.client.main.Main", // mc launcher -> original
@@ -116,14 +64,35 @@ public class MinecraftListener extends GamepadAdapter {
             "org.prismlauncher.EntryPoint" // prism launcher
     };
 
-    /** minecraft launchers pid which displayName contains one of those */
-    private static int getMcLauncherPid() {
-        for (VirtualMachineDescriptor descriptor : VirtualMachine.list()) {
-            if (Arrays.asList(mcLaunchers).contains(descriptor.displayName())) {
-                return Integer.decode(descriptor.id());
+    private long prevForBounds;
+
+    @Override
+    public boolean match(AppInfo a) {
+        try {
+            if (a.pid() == getPidByMainClassName(mcLaunchers)) {
+                if (System.currentTimeMillis() - prevForBounds > 20 * 1000) {
+                    prevForBounds = System.currentTimeMillis();
+                    Executors.newSingleThreadScheduledExecutor().submit(() -> {
+                        Rectangle b = a.bounds();
+                        if (b != null) {
+                            Rectangle r = bounds.get();
+                            if (r == null) {
+                                bounds.set(b);
+                            } else {
+                                r.setBounds(b);
+                            }
+//Debug.println("minecraft window found: " + r);
+//                        } else {
+//Debug.println("no minecraft window found.");
+                        }
+                    });
+                }
+                return true;
             }
+        } catch (NoSuchElementException e) {
+//Debug.println(e.getMessage());
         }
-        throw new NoSuchElementException("minecraft might not run");
+        return false;
     }
 
     // ----
@@ -146,7 +115,6 @@ public class MinecraftListener extends GamepadAdapter {
     private final AtomicReference<Rectangle> bounds = new AtomicReference<>();
 
     /**
-     * @before {@link #retrieveBounds}
      * @after {@link #point}
      */
     private void normalizePoint() {
@@ -164,32 +132,6 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
-    static class Key {
-        final int code;
-        final Consumer<Integer> pressAction;
-        final Consumer<Integer> releaseAction;
-        boolean pressed;
-
-        public Key(int code, Consumer<Integer> pressAction, Consumer<Integer> releaseAction) {
-            this.code = code;
-            this.pressAction = pressAction;
-            this.releaseAction = releaseAction;
-        }
-
-        void press() {
-            if (!pressed) {
-                pressAction.accept(code);
-                pressed = true;
-            }
-        }
-        void release() {
-            if (pressed) {
-                releaseAction.accept(code);
-                pressed = false;
-            }
-        }
-    }
-
     class RobotKey extends Key {
         RobotKey(int code) {
             super(code, robot::keyPress, robot::keyRelease);
@@ -198,38 +140,7 @@ public class MinecraftListener extends GamepadAdapter {
 
     class RobotKey2 extends Key {
         RobotKey2(int code) {
-            super(code, robot::keyPress2, robot::keyRelease2);
-        }
-    }
-
-    @FunctionalInterface
-    interface TriConsumer<T, U, V> {
-        void accept(T t, U u, V v);
-    }
-
-    static class KeyWithCoordinate {
-        final int code;
-        final TriConsumer<Integer, Integer, Integer> pressActionWithCoordinat;
-        final TriConsumer<Integer, Integer, Integer> releaseActionWithCoordinat;
-        boolean pressed;
-
-        public KeyWithCoordinate(int code, TriConsumer<Integer, Integer, Integer> pressActionWithCoordinate, TriConsumer<Integer, Integer, Integer> releaseActionWithCoordinate) {
-            this.code = code;
-            this.pressActionWithCoordinat = pressActionWithCoordinate;
-            this.releaseActionWithCoordinat = releaseActionWithCoordinate;
-        }
-
-        void press(int x, int y) {
-            if (!pressed) {
-                pressActionWithCoordinat.accept(code, x, y);
-                pressed = true;
-            }
-        }
-        void release(int x, int y) {
-            if (pressed) {
-                releaseActionWithCoordinat.accept(code, x, y);
-                pressed = false;
-            }
+            super(code, robot::keyPressRaw, robot::keyReleaseRaw);
         }
     }
 
@@ -580,9 +491,9 @@ Debug.println(Level.FINER, "PAD: ... E");
     @Override
     public void after() {
         if (moved) {
-            robot.mouseMove2(dx, dy);
+            robot.mouseMoveOnlyAccel(dx, dy);
             normalizePoint();
-            robot.mouseMove0(point.x, point.y);
+            robot.mouseMoveOnlyLocation(point.x, point.y);
         }
     }
 }
