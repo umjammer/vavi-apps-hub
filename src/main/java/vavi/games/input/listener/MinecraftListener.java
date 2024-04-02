@@ -150,26 +150,26 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
-    Key key_D = new RobotKey(kVK_ANSI_D);
-    Key key_A = new RobotKey(kVK_ANSI_A);
-    Key key_S = new RobotKey(kVK_ANSI_S);
-    Key key_W = new RobotKey(kVK_ANSI_W);
-    Key key_F = new RobotKey(kVK_ANSI_F);
-    Key key_F8 = new RobotKey(kVK_F8);
-    Key key_0 = new RobotKey(kVK_ANSI_0);
-    Key key_SPACE = new RobotKey(kVK_Space);
-    Key key_2 = new RobotKey(kVK_ANSI_2);
-    Key key_5 = new RobotKey(kVK_ANSI_5);
-    Key mouseKey_0 = new RobotMouseKey(kCGMouseButtonLeft);
-    Key mouseKey_1 = new RobotMouseKey(kCGMouseButtonRight);
-    Key key_CONTROL = new RobotKey2(kVK_Control);
-    Key key_SHIFT = new RobotKey2(kVK_Shift);
-    Key key_ESCAPE = new RobotKey(kVK_Escape);
-    Key key_Q = new RobotKey(kVK_ANSI_Q);
-    Key key_OPTION = new RobotKey2(kVK_Option);
-    Key key_F5 = new RobotKey(kVK_F5);
-    Key key_F3 = new RobotKey(kVK_F3);
-    Key key_E = new RobotKey(kVK_ANSI_E);
+    final Key key_D = new RobotKey(kVK_ANSI_D);
+    final Key key_A = new RobotKey(kVK_ANSI_A);
+    final Key key_S = new RobotKey(kVK_ANSI_S);
+    final Key key_W = new RobotKey(kVK_ANSI_W);
+    final Key key_F = new RobotKey(kVK_ANSI_F);
+    final Key key_F8 = new RobotKey(kVK_F8);
+    final Key key_0 = new RobotKey(kVK_ANSI_0);
+    final Key key_SPACE = new RobotKey(kVK_Space);
+    final Key key_2 = new RobotKey(kVK_ANSI_2);
+    final Key key_5 = new RobotKey(kVK_ANSI_5);
+    final Key mouseKey_0 = new RobotMouseKey(kCGMouseButtonLeft);
+    final Key mouseKey_1 = new RobotMouseKey(kCGMouseButtonRight);
+    final Key key_CONTROL = new RobotKey2(kVK_Control);
+    final Key key_SHIFT = new RobotKey2(kVK_Shift);
+    final Key key_ESCAPE = new RobotKey(kVK_Escape);
+    final Key key_Q = new RobotKey(kVK_ANSI_Q);
+    final Key key_OPTION = new RobotKey2(kVK_Option);
+    final Key key_F5 = new RobotKey(kVK_F5);
+    final Key key_F3 = new RobotKey(kVK_F3);
+    final Key key_E = new RobotKey(kVK_ANSI_E);
 
     private Context context;
 

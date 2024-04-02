@@ -6,11 +6,11 @@
 
 package vavi.apps.hub;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
+import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.usb.HidController;
-import vavi.games.input.hid4java.spi.Hid4JavaEnvironmentPlugin;
+import net.java.games.input.usb.HidControllerEnvironment;
 import vavi.games.input.listener.GamepadInputEventListener;
 import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
@@ -49,7 +49,8 @@ public class Gamepad implements Plugin {
             vendorId = Integer.decode(mid);
             productId = Integer.decode(pid);
 
-            Hid4JavaEnvironmentPlugin environment = new Hid4JavaEnvironmentPlugin();
+            String name = "vavi.games.input.hid4java";
+            HidControllerEnvironment environment = (HidControllerEnvironment) ControllerEnvironment.getEnvironmentByName(name);
             HidController controller = environment.getController(vendorId, productId);
 Debug.println(Level.INFO, controller);
 
@@ -58,7 +59,8 @@ Debug.println(Level.INFO, controller);
             controller.addInputEventListener(listener);
 
             controller.open();
-        } catch (IOException e) {
+        } catch (Exception e) {
+Debug.printStackTrace(e);
             throw new IllegalStateException(e);
         }
     }

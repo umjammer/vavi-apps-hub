@@ -28,7 +28,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class JsonCodec {
 
-    private static Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+    private static final Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
         @Override
         public boolean shouldSkipField(FieldAttributes f) {
             return false;

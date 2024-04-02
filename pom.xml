@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -170,13 +170,13 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.11</version>
+      <version>1.1.12</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.8</version>
+      <version>0.0.10</version>
     </dependency>
 
     <dependency>
@@ -234,7 +234,7 @@
     <dependency>
       <groupId>com.formdev</groupId>
       <artifactId>flatlaf</artifactId>
-      <version>3.3</version>
+      <version>3.4.1</version>
       <scope>runtime</scope>
     </dependency>
 
