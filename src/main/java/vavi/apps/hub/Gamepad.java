@@ -28,6 +28,7 @@ public class Gamepad implements Plugin {
 
     static {
         System.setProperty("net.java.games.input.InputEvent.fillAll", "true");
+        System.setProperty("net.java.games.input.ControllerEnvironment.excludes", "net.java.games.input");
 
         System.setProperty("vavi.games.input.listener.period", "100");
         System.setProperty("vavi.games.input.listener.warmup", "500");
