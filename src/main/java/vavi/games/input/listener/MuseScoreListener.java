@@ -6,6 +6,8 @@
 
 package vavi.games.input.listener;
 
+import java.util.Objects;
+
 import net.java.games.input.Event;
 import vavi.games.input.listener.GamepadInputEventListener.AppInfo;
 import vavi.games.input.listener.GamepadInputEventListener.Context;
@@ -34,7 +36,7 @@ public class MuseScoreListener extends GamepadAdapter {
 
     @Override
     public boolean match(AppInfo a) {
-        return a.id().equals(bundleId);
+        return Objects.requireNonNullElse(a.id(), false).equals(bundleId);
     }
 
     private Context context;
