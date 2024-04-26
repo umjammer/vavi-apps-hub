@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -71,6 +71,7 @@
 
                   <additionalResources>
                     <additionalResource>${project.build.resources[0].directory}/logging.properties</additionalResource>
+                    <additionalResource>${project.build.resources[0].directory}/minecraft.properties</additionalResource>
                     <additionalResource>${project.build.resources[0].directory}/static</additionalResource>
                     <additionalResource>local.properties</additionalResource>
                   </additionalResources>
@@ -176,7 +177,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.11</version>
+      <version>0.0.12</version>
     </dependency>
 
     <dependency>
@@ -189,7 +190,7 @@
     <dependency>
       <groupId>jakarta.websocket</groupId>
       <artifactId>jakarta.websocket-api</artifactId>
-      <version>2.1.1</version>
+      <version>2.2.0-M1</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee10.websocket</groupId>
@@ -253,7 +254,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <version>2.0.11</version>
+      <version>2.0.13</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
