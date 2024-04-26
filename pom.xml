@@ -71,6 +71,7 @@
 
                   <additionalResources>
                     <additionalResource>${project.build.resources[0].directory}/logging.properties</additionalResource>
+                    <additionalResource>${project.build.resources[0].directory}/minecraft.properties</additionalResource>
                     <additionalResource>${project.build.resources[0].directory}/static</additionalResource>
                     <additionalResource>local.properties</additionalResource>
                   </additionalResources>
@@ -176,7 +177,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.11</version>
+      <version>0.0.12</version>
     </dependency>
 
     <dependency>
