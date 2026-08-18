@@ -160,6 +160,7 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
+    // TODO configurable
     final Key key_D = new RobotKey(kVK_ANSI_D);
     final Key key_A = new RobotKey(kVK_ANSI_A);
     final Key key_S = new RobotKey(kVK_ANSI_S);
