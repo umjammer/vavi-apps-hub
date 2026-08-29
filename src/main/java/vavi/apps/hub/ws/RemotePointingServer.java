@@ -6,6 +6,9 @@
 
 package vavi.apps.hub.ws;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
@@ -29,28 +32,30 @@ import vavi.util.Debug;
         encoders = JsonEncoder.class)
 public class RemotePointingServer {
 
+    private static final Logger logger = System.getLogger(RemotePointingServer.class.getName());
+
     @OnOpen
     public void onOpen(Session session) {
-Debug.println("onOpen");
+logger.log(Level.DEBUG, "onOpen");
     }
 
     @OnMessage
     public ClientData onMessage(ClientData data) {
-Debug.println("onMessage " + data.message + ": " + data.mx + ", " + data.my);
+logger.log(Level.DEBUG, "onMessage " + data.message + ": " + data.mx + ", " + data.my);
         return data;
     }
 
     @OnError
     public void onError(Throwable t) {
         if (t instanceof WebSocketTimeoutException) {
-Debug.println(t.getMessage());
+logger.log(Level.ERROR, t.getMessage());
         } else {
-Debug.printStackTrace(t);
+logger.log(Level.ERROR, t);
         }
     }
 
     @OnClose
     public void onClose(Session session) {
-Debug.println("onClose");
+logger.log(Level.DEBUG, "onClose");
     }
 }

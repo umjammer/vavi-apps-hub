@@ -6,13 +6,14 @@
 
 package vavi.games.input.listener;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Objects;
 
 import net.java.games.input.Event;
 import vavi.games.input.listener.GamepadInputEventListener.AppInfo;
 import vavi.games.input.listener.GamepadInputEventListener.Context;
 import vavi.games.input.robot.RococaRobot;
-import vavi.util.Debug;
 import vavi.util.event.GenericEvent;
 
 import static org.rococoa.carbon.CarbonCoreLibrary.kVK_ANSI_Backslash;
@@ -27,6 +28,8 @@ import static org.rococoa.carbon.CarbonCoreLibrary.kVK_Command;
  * @version 0.00 2024-03-20 nsano initial version <br>
  */
 public class MuseScoreListener extends GamepadAdapter {
+
+    private static final Logger logger = System.getLogger(MuseScoreListener.class.getName());
 
     final RococaRobot robot = new RococaRobot();
 
@@ -68,11 +71,11 @@ public class MuseScoreListener extends GamepadAdapter {
                 if (Math.signum(v) > 0) {
                     robot.keyPress(kVK_ANSI_Backslash); // TODO name is not match. this is right bracket
                     robot.keyRelease(kVK_ANSI_Backslash);
-Debug.println("⌘ + ]");
+logger.log(Level.DEBUG, "⌘ + ]");
                 } else {
                     robot.keyPress(kVK_ANSI_RightBracket); // TODO name is not match. this is left bracket
                     robot.keyRelease(kVK_ANSI_RightBracket);
-Debug.println("⌘ + [");
+logger.log(Level.DEBUG, "⌘ + [");
                 }
                 robot.keyRelease(kVK_Command);
 

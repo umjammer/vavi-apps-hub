@@ -14,9 +14,10 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import javax.imageio.ImageIO;
 
-import vavi.util.Debug;
 import vavi.util.event.GenericEvent;
 
 
@@ -27,6 +28,8 @@ import vavi.util.event.GenericEvent;
  * @version 0.00 2024-03-25 nsano initial version <br>
  */
 public class Tray implements Plugin {
+
+    private static final Logger logger = System.getLogger(Tray.class.getName());
 
     /** */
     private PopupMenu popup;
@@ -61,7 +64,7 @@ public class Tray implements Plugin {
         EventQueue.invokeLater(() -> {
             // Check if the system tray is supported.
             if (!SystemTray.isSupported()) {
-Debug.println("SystemTray is not supported");
+logger.log(Level.DEBUG, "SystemTray is not supported");
                 return;
             }
 
@@ -98,7 +101,7 @@ Debug.println("SystemTray is not supported");
                 throw new IllegalStateException(e);
             }
 
-Debug.println("SystemTray is set");
+logger.log(Level.DEBUG, "SystemTray is set");
         });
     }
 }

@@ -6,6 +6,8 @@
 
 package vavi.apps.hub.jersey;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -26,6 +28,8 @@ import vavi.util.Debug;
 @Path("notification")
 public class NotificationService {
 
+    private static final Logger logger = System.getLogger(NotificationService.class.getName());
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("notify")
@@ -33,7 +37,7 @@ public class NotificationService {
                     @QueryParam("title") String title,
                     @QueryParam("from") String from) {
         try {
-Debug.println("message " + message);
+logger.log(Level.DEBUG, "message " + message);
             String subTitle = "From: " + from;
             String sound = "Frog";
             ScriptEngineManager factory = new ScriptEngineManager();
@@ -43,8 +47,8 @@ Debug.println("message " + message);
                     "display notification \"%s\" with title \"%s\" subtitle \"%s\" sound name \"%s\"",
                     message, title, subTitle, sound);
             Object r = engine.eval(script);
-Debug.println("script: " + script);
-Debug.println("result: " + r);
+logger.log(Level.DEBUG, "script: " + script);
+logger.log(Level.DEBUG, "result: " + r);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }

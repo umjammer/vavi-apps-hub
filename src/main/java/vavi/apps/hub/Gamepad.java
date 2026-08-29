@@ -6,13 +6,13 @@
 
 package vavi.apps.hub;
 
-import java.util.logging.Level;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.usb.HidController;
 import net.java.games.input.usb.HidControllerEnvironment;
 import vavi.games.input.listener.GamepadInputEventListener;
-import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
@@ -25,6 +25,8 @@ import vavi.util.properties.annotation.PropsEntity;
  */
 @PropsEntity(url = "file:local.properties")
 public class Gamepad implements Plugin {
+
+    private static final Logger logger = System.getLogger(Gamepad.class.getName());
 
     static {
         System.setProperty("net.java.games.input.InputEvent.fillAll", "true");
@@ -53,7 +55,7 @@ public class Gamepad implements Plugin {
             String name = "vavi.games.input.hid4java";
             HidControllerEnvironment environment = (HidControllerEnvironment) ControllerEnvironment.getEnvironmentByName(name);
             HidController controller = environment.getController(vendorId, productId);
-Debug.println(Level.INFO, controller);
+logger.log(Level.INFO, controller);
 
             GamepadInputEventListener listener = new GamepadInputEventListener();
             listener.addObserver(context::fireEventHappened);
@@ -61,7 +63,7 @@ Debug.println(Level.INFO, controller);
 
             controller.open();
         } catch (Exception e) {
-Debug.printStackTrace(e);
+logger.log(Level.ERROR, e.getMessage(), e);
             throw new IllegalStateException(e);
         }
     }
