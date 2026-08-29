@@ -36,6 +36,10 @@ public class NotificationService {
     public void say(@QueryParam("message") String message,
                     @QueryParam("title") String title,
                     @QueryParam("from") String from) {
+        vavi.apps.hub.Context context = vavi.apps.hub.Context.getInstance();
+        if (context != null) {
+            context.touch();
+        }
         try {
 logger.log(Level.DEBUG, "message " + message);
             String subTitle = "From: " + from;

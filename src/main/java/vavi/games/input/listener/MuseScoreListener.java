@@ -67,6 +67,10 @@ public class MuseScoreListener extends GamepadAdapter {
             float a = Math.abs(v);
 
             if (a > 30) { // threshold
+                vavi.apps.hub.Context hubContext = vavi.apps.hub.Context.getInstance();
+                if (hubContext != null) {
+                    hubContext.touch();
+                }
                 robot.keyPress(kVK_Command);
                 if (Math.signum(v) > 0) {
                     robot.keyPress(kVK_ANSI_Backslash); // TODO name is not match. this is right bracket

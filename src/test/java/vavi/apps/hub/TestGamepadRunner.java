@@ -54,4 +54,47 @@ public class TestGamepadRunner {
         }
         hd2.shutdown();
     }
+
+    @Test
+    @EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
+    void testCpuUsageWhenMuted() throws Exception {
+        System.out.println("--- Testing CPU / Event Flow with Pause / Sleep ---");
+        String name = "vavi.games.input.hid4java";
+        var env = (net.java.games.input.usb.HidControllerEnvironment) net.java.games.input.ControllerEnvironment.getEnvironmentByName(name);
+        var controller = env.getController(0x54c, 0x9cc);
+
+        java.util.concurrent.atomic.AtomicBoolean sleeping = new java.util.concurrent.atomic.AtomicBoolean(false);
+        java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger();
+        controller.addInputEventListener(ev -> {
+            if (sleeping.get()) {
+                return;
+            }
+            count.incrementAndGet();
+        });
+
+        controller.open();
+
+        // Active period
+        Thread.sleep(1000);
+        int activeCount = count.get();
+        System.out.println("Active events processed: " + activeCount);
+
+        // Sleep period (pause event processing)
+        sleeping.set(true);
+        int sleepStartCount = count.get();
+        Thread.sleep(1000);
+        int sleepEvents = count.get() - sleepStartCount;
+        System.out.println("Sleeping events processed: " + sleepEvents);
+
+        // Awake period (resume event processing)
+        sleeping.set(false);
+        int awakeStartCount = count.get();
+        Thread.sleep(1000);
+        int awakeEvents = count.get() - awakeStartCount;
+        System.out.println("Awakened events processed: " + awakeEvents);
+
+        org.junit.jupiter.api.Assertions.assertTrue(activeCount > 0, "Should have received events when active");
+        org.junit.jupiter.api.Assertions.assertEquals(0, sleepEvents, "Should process 0 events while sleeping");
+        org.junit.jupiter.api.Assertions.assertTrue(awakeEvents > 0, "Should resume processing events when awake");
+    }
 }

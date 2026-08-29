@@ -36,11 +36,19 @@ public class RemotePointingServer {
 
     @OnOpen
     public void onOpen(Session session) {
+        vavi.apps.hub.Context context = vavi.apps.hub.Context.getInstance();
+        if (context != null) {
+            context.touch();
+        }
 logger.log(Level.DEBUG, "onOpen");
     }
 
     @OnMessage
     public ClientData onMessage(ClientData data) {
+        vavi.apps.hub.Context context = vavi.apps.hub.Context.getInstance();
+        if (context != null) {
+            context.touch();
+        }
 logger.log(Level.DEBUG, "onMessage " + data.message + ": " + data.mx + ", " + data.my);
         return data;
     }

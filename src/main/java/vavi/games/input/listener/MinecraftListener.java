@@ -74,6 +74,12 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
+    private static final java.util.concurrent.ExecutorService boundsExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "MinecraftBounds");
+        t.setDaemon(true);
+        return t;
+    });
+
     private long prevForBounds;
 
     @Override
@@ -82,7 +88,7 @@ public class MinecraftListener extends GamepadAdapter {
             if (a.pid() == getPidByMainClassName(mcLaunchers)) {
                 if (System.currentTimeMillis() - prevForBounds > 20 * 1000) {
                     prevForBounds = System.currentTimeMillis();
-                    Executors.newSingleThreadScheduledExecutor().submit(() -> {
+                    boundsExecutor.submit(() -> {
                         Rectangle b = a.bounds();
                         if (b != null) {
                             Rectangle r = bounds.get();
@@ -499,9 +505,17 @@ logger.log(Level.TRACE, "PAD: ... E");
         }
     }
 
+    private static void touch() {
+        vavi.apps.hub.Context hubContext = vavi.apps.hub.Context.getInstance();
+        if (hubContext != null) {
+            hubContext.touch();
+        }
+    }
+
     @Override
     public void after() {
         if (moved) {
+            touch();
             robot.mouseMoveOnlyAccel(dx, dy);
             normalizePoint();
             robot.mouseMoveOnlyLocation(point.x, point.y);

@@ -38,28 +38,67 @@ public class Tray implements Plugin {
     MenuItem gamepadItem;
 
     /** */
+    MenuItem sleepToggleItem;
+
+    /** */
     private TrayIcon trayIcon;
 
+    private Context context;
+
+    private String lastBundleId = null;
+
+    void updateTray() {
+        if (popup == null || context == null) {
+            return;
+        }
+        if (gamepadItem == null) {
+            gamepadItem = new MenuItem();
+            popup.insert(gamepadItem, 0);
+        }
+        if (sleepToggleItem == null) {
+            sleepToggleItem = new MenuItem();
+            sleepToggleItem.addActionListener(e -> {
+                if (context != null) {
+                    if (context.isSleeping()) {
+                        context.awake();
+                    } else {
+                        context.sleep();
+                    }
+                }
+            });
+            popup.insert(sleepToggleItem, 1);
+        }
+
+        boolean sleeping = context.isSleeping();
+        if (sleeping) {
+            gamepadItem.setLabel("🎮 " + (lastBundleId != null ? lastBundleId : "none") + " (sleep)");
+            sleepToggleItem.setLabel("⚡ Awake");
+            if (trayIcon != null) {
+                trayIcon.setToolTip("HUB (Sleeping)");
+            }
+        } else {
+            gamepadItem.setLabel("🎮 " + (lastBundleId != null ? lastBundleId : "none"));
+            sleepToggleItem.setLabel("💤 Sleep");
+            if (trayIcon != null) {
+                trayIcon.setToolTip("HUB (Active)");
+            }
+        }
+    }
+
     /** TODO location should be at gamepad plugin */
-    void gamepad(GenericEvent event) {
+    void onEvent(GenericEvent event) {
         EventQueue.invokeLater(() -> {
-            if (popup == null) {
-                return;
-            }
-            if (gamepadItem == null) {
-                gamepadItem = new MenuItem();
-                popup.insert(gamepadItem, 0);
-            }
             if (event.getName().equals("gamepad.listener.changed")) {
-                String bundleId = (String) event.getArguments()[0];
-                gamepadItem.setLabel("🎮 " + (bundleId != null ? bundleId : "none"));
+                lastBundleId = (String) event.getArguments()[0];
             }
+            updateTray();
         });
     }
 
     @Override
     public void init(Context context) {
-        context.addObserver(this::gamepad);
+        this.context = context;
+        context.addObserver(this::onEvent);
 
         EventQueue.invokeLater(() -> {
             // Check if the system tray is supported.
@@ -100,6 +139,8 @@ logger.log(Level.DEBUG, "SystemTray is not supported");
             } catch (AWTException e) {
                 throw new IllegalStateException(e);
             }
+
+            updateTray();
 
 logger.log(Level.DEBUG, "SystemTray is set");
         });
