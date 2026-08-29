@@ -20,6 +20,22 @@
 
  * [maven](https://jitpack.io/#umjammer/vavi-apps-hub)
 
+### Build Hub.app
+
+```shell
+$ mvn clean package
+$ ls target/Hub
+Hub.app
+```
+
+### System Settings
+
+ - Privacy & Security:
+   - Accessibility: Click + and add Hub.app (ensure the toggle is ON).
+   - Input Monitoring: Click + and add Hub.app (ensure the toggle is ON).
+
+⚠️ mandatory: you need to do above every time after building this app
+
 ## Usage
 
 ### server
@@ -59,6 +75,8 @@
  * WebTransport
    * [netty](https://netty.io/)
    * jetty
+ * apple pencil
+   * https://github.com/shuding/apple-pencil-safari-api-test
 
 ## TODO
 
@@ -68,6 +86,8 @@
  * ~~apple remote event?~~ -> this rest server (done)
  * ~~coexistence websocket and jersey on jetty~~ see [Main.java](src/main/java/vavi/apps/hub/Main.java)
  * gamepad configuration, dsl?, json?
+ * ~~gamepad reconnection~~
+ * ~~sleep mode~~
 
 ---
 <sub>image by <a href="https://www.silhouette-illust.com/illust/49214">silhouette illust</a></sub>
