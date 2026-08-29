@@ -6,6 +6,8 @@
 
 package vavi.apps.hub;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ServiceLoader;
 
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -18,7 +20,6 @@ import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import vavi.apps.hub.ws.WebSocketInitializerServlet;
-import vavi.util.Debug;
 
 
 /**
@@ -29,9 +30,11 @@ import vavi.util.Debug;
  */
 public class Main {
 
+    private static final Logger logger = System.getLogger(Main.class.getName());
+
     /** */
     public static void main(String[] args) throws Exception {
-        System.setProperty("apple.awt.UIElement", "true"); // eliminate dock icon
+//        System.setProperty("apple.awt.UIElement", "true"); // eliminate dock icon (handled by Info.plist LSUIElement)
 
         Server server = null;
         try {
@@ -51,7 +54,7 @@ public class Main {
 
             // static
             ResourceHandler rh = new ResourceHandler();
-Debug.println("static root: " + System.getProperty("vavi.test.webapp") + ", " + System.getProperty("user.dir"));
+logger.log(Level.DEBUG, "static root: " + System.getProperty("vavi.test.webapp") + ", " + System.getProperty("user.dir"));
             rh.setBaseResource(ResourceFactory.of(rh).newResource(System.getProperty("vavi.test.webapp", "") + "static"));
             rh.setWelcomeFiles("index.html");
 
@@ -68,18 +71,18 @@ Debug.println("static root: " + System.getProperty("vavi.test.webapp") + ", " + 
             ServiceLoader.load(Plugin.class).forEach(p -> {
                 try {
                     p.init(context);
-Debug.println("PLUGIN: " + p);
+logger.log(Level.DEBUG, "PLUGIN: " + p);
                 } catch (Exception e) {
-Debug.println("PLUGIN: " + e.getMessage());
+logger.log(Level.DEBUG, "PLUGIN: " + e.getMessage());
                 }
             });
 
             server.start();
-Debug.println("server start");
+logger.log(Level.DEBUG, "server start");
             server.join();
-Debug.println("server join");
+logger.log(Level.DEBUG, "server join");
         } catch (Exception e) {
-            Debug.printStackTrace(e);
+            logger.log(Level.ERROR, e.getMessage(), e);
             throw e;
         } finally {
             if (server != null) {
@@ -87,5 +90,4 @@ Debug.println("server join");
             }
         }
     }
-
 }

@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -81,7 +81,7 @@
                     <vmArg>java.desktop/com.apple.eawt=ALL-UNNAMED</vmArg>
                     <vmArg>--add-opens</vmArg>
                     <vmArg>java.base/java.lang=ALL-UNNAMED</vmArg>
-                    <vmArg>-Djna.library.path=/usr/local/lib:.</vmArg>
+                    <vmArg>-Djna.library.path=/opt/homebrew/lib:/usr/local/lib:.</vmArg>
                     <vmArg>-Dapple.laf.useScreenMenuBar=true</vmArg>
                     <vmArg>-Djava.util.logging.config.file=./logging.properties</vmArg>
                   </vmArgs>
@@ -97,10 +97,59 @@
                       <string>${javapackager.name}</string>
                       <key>CFBundleShortVersionString</key>
                       <string>${git.build.time}</string>
+                      <key>LSUIElement</key>
+                      <true/>
                     ]]>
                       </additionalEntries>
                     </infoPlist>
                   </macConfig>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>patch-universal-java-application-stub</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Fix CFBundlePackageType from BNDL to APPL for standard macOS application -->
+                    <replace file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/Info.plist"
+                             token="&lt;string&gt;BNDL&lt;/string&gt;"
+                             value="&lt;string&gt;APPL&lt;/string&gt;" />
+                    <replace file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/Info.plist"
+                             token="&lt;string&gt;universalJavaApplicationStub&lt;/string&gt;"
+                             value="&lt;string&gt;${javapackager.name}&lt;/string&gt;" />
+                    <!-- Build native Mach-O launcher to prevent RunningBoard PID mismatch & ControlCenter rejection on modern macOS -->
+                    <exec executable="clang" failonerror="true">
+                      <arg value="-arch" />
+                      <arg value="arm64" />
+                      <arg value="-o" />
+                      <arg value="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/MacOS/${javapackager.name}" />
+                      <arg value="${project.basedir}/src/main/native/launcher.c" />
+                    </exec>
+                    <chmod file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/MacOS/${javapackager.name}"
+                           perm="755" />
+                    <!-- Ad-hoc codesign the bundle with stable designated requirement so macOS permissions persist across builds -->
+                    <exec executable="codesign" failonerror="false">
+                      <arg value="--force" />
+                      <arg value="--deep" />
+                      <arg value="--sign" />
+                      <arg value="-" />
+                      <arg value="--identifier" />
+                      <arg value="${javapackager.name}" />
+                      <arg value="--requirements" />
+                      <arg value="=designated =&gt; identifier &quot;${javapackager.name}&quot;" />
+                      <arg value="${project.build.directory}/${javapackager.name}/${javapackager.name}.app" />
+                    </exec>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -115,7 +164,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.12.1</version>
         <configuration>
           <release>17</release>
         </configuration>
@@ -123,7 +172,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.5</version>
         <configuration>
           <argLine>
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
@@ -146,21 +195,21 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.10.2</version>
+        <version>6.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>3.1.5</version>
+        <version>4.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-bom</artifactId>
-        <version>12.0.7</version>
+        <version>12.1.12</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -171,31 +220,31 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.12</version>
+      <version>1.1.20</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.12</version>
+      <version>0.0.13</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.10.1</version>
+      <version>2.14.0</version>
     </dependency>
 
     <!-- web socket -->
     <dependency>
       <groupId>jakarta.websocket</groupId>
       <artifactId>jakarta.websocket-api</artifactId>
-      <version>2.2.0-M1</version>
+      <version>2.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee10.websocket</groupId>
       <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
-      <version>12.0.7</version>
+      <version>12.1.5</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -228,14 +277,14 @@
     <dependency>
       <groupId>org.eclipse.angus</groupId>
       <artifactId>angus-activation</artifactId>
-      <version>2.0.2</version>
+      <version>2.0.3</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>com.formdev</groupId>
       <artifactId>flatlaf</artifactId>
-      <version>3.4.1</version>
+      <version>3.5</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -254,7 +303,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <version>2.0.13</version>
+      <version>2.0.18</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>

@@ -12,18 +12,18 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 import net.java.games.input.Event;
 import vavi.games.input.listener.GamepadInputEventListener.AppInfo;
 import vavi.games.input.listener.GamepadInputEventListener.Context;
 import vavi.games.input.robot.Key;
 import vavi.games.input.robot.RococaRobot;
-import vavi.util.Debug;
 import vavi.util.event.GenericEvent;
 
 import static org.rococoa.carbon.CarbonCoreLibrary.kVK_ANSI_0;
@@ -57,6 +57,8 @@ import static vavi.games.input.helper.JavaVMAppInfo.getPidByMainClassName;
  */
 public class MinecraftListener extends GamepadAdapter {
 
+    private static final Logger logger = System.getLogger(MinecraftListener.class.getName());
+
     private static final String bundleId = "com.mojang.Minecraft";
 
     /** minecraft launchers descriptor#dusplayName */
@@ -72,6 +74,12 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
+    private static final java.util.concurrent.ExecutorService boundsExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "MinecraftBounds");
+        t.setDaemon(true);
+        return t;
+    });
+
     private long prevForBounds;
 
     @Override
@@ -80,7 +88,7 @@ public class MinecraftListener extends GamepadAdapter {
             if (a.pid() == getPidByMainClassName(mcLaunchers)) {
                 if (System.currentTimeMillis() - prevForBounds > 20 * 1000) {
                     prevForBounds = System.currentTimeMillis();
-                    Executors.newSingleThreadScheduledExecutor().submit(() -> {
+                    boundsExecutor.submit(() -> {
                         Rectangle b = a.bounds();
                         if (b != null) {
                             Rectangle r = bounds.get();
@@ -89,16 +97,16 @@ public class MinecraftListener extends GamepadAdapter {
                             } else {
                                 r.setBounds(b);
                             }
-//Debug.println("minecraft window found: " + r);
+//logger.log(Level.TRACE, "minecraft window found: " + r);
 //                        } else {
-//Debug.println("no minecraft window found.");
+//logger.log(Level.TRACE, "no minecraft window found.");
                         }
                     });
                 }
                 return true;
             }
         } catch (NoSuchElementException e) {
-//Debug.println(e.getMessage());
+//logger.log(Level.ERROR, e.getMessage(), e);
         }
         return false;
     }
@@ -158,6 +166,7 @@ public class MinecraftListener extends GamepadAdapter {
         }
     }
 
+    // TODO configurable
     final Key key_D = new RobotKey(kVK_ANSI_D);
     final Key key_A = new RobotKey(kVK_ANSI_A);
     final Key key_S = new RobotKey(kVK_ANSI_S);
@@ -212,10 +221,10 @@ public class MinecraftListener extends GamepadAdapter {
         if (a > threshold) {
             if (Math.signum(v) > 0) {
                 key_D.press();
-Debug.println(Level.FINER, "L3 axis x+ ... D");
+logger.log(Level.TRACE, "L3 axis x+ ... D");
             } else {
                 key_A.press();
-Debug.println(Level.FINER, "L3 axis x- ... A");
+logger.log(Level.TRACE, "L3 axis x- ... A");
             }
         } else {
             key_D.release();
@@ -232,10 +241,10 @@ Debug.println(Level.FINER, "L3 axis x- ... A");
         if (a > threshold) {
             if (Math.signum(v) > 0) {
                 key_S.press();
-Debug.println(Level.FINER, "L3 axis y- ... S");
+logger.log(Level.TRACE, "L3 axis y- ... S");
             } else {
                 key_W.press();
-Debug.println(Level.FINER, "L3 axis y+ ... W");
+logger.log(Level.TRACE, "L3 axis y+ ... W");
             }
         } else {
             key_S.release();
@@ -253,7 +262,7 @@ Debug.println(Level.FINER, "L3 axis y+ ... W");
             dx = (int) v;
             point.x += dx;
             moved = true;
-Debug.println(Level.FINER, "R3 axis x ... " + (v > 0 ? "+" : "") + v + ", " + a);
+logger.log(Level.TRACE, "R3 axis x ... " + (v > 0 ? "+" : "") + v + ", " + a);
         }
     }
 
@@ -267,7 +276,7 @@ Debug.println(Level.FINER, "R3 axis x ... " + (v > 0 ? "+" : "") + v + ", " + a)
             dy = (int) -v;
             point.y += dy;
             moved = true;
-Debug.println(Level.FINER, "R3 axis y ... " + (v > 0 ? "+" : "") + v + ", " + a);
+logger.log(Level.TRACE, "R3 axis y ... " + (v > 0 ? "+" : "") + v + ", " + a);
         }
     }
 
@@ -287,23 +296,23 @@ Debug.println(Level.FINER, "R3 axis y ... " + (v > 0 ? "+" : "") + v + ", " + a)
         switch (v) {
             case 0 -> {
                 key_F.press();
-Debug.println(Level.FINER, "↑");
+logger.log(Level.TRACE, "↑");
             }
             case 2 -> {
                 if (System.currentTimeMillis() - prev > intervalWheel) {
                     robot.mouseWheel(-1);
-Debug.println(Level.FINER, "→ ... mouse wheel +");
+logger.log(Level.TRACE, "→ ... mouse wheel +");
                     prev = System.currentTimeMillis();
                 }
             }
             case 4 -> {
                 key_F8.press();
-Debug.println(Level.FINER, "↓");
+logger.log(Level.TRACE, "↓");
             }
             case 6 -> {
                 if (System.currentTimeMillis() - prev > intervalWheel) {
                     robot.mouseWheel(+1);
-Debug.println(Level.FINER, "← ... mouse wheel +");
+logger.log(Level.TRACE, "← ... mouse wheel +");
                     prev = System.currentTimeMillis();
                 }
             }
@@ -321,7 +330,7 @@ Debug.println(Level.FINER, "← ... mouse wheel +");
 
         if (v) {
             key_0.press();
-Debug.println(Level.FINER, "□ ... 0");
+logger.log(Level.TRACE, "□ ... 0");
         } else {
             key_0.release();
         }
@@ -334,7 +343,7 @@ Debug.println(Level.FINER, "□ ... 0");
 
         if (v) {
             key_SPACE.press();
-Debug.println(Level.FINER, "✗ ... SPACE");
+logger.log(Level.TRACE, "✗ ... SPACE");
         } else {
             key_SPACE.release();
         }
@@ -347,7 +356,7 @@ Debug.println(Level.FINER, "✗ ... SPACE");
 
         if (v) {
             key_2.press();
-Debug.println(Level.FINER, "◯ ... 2");
+logger.log(Level.TRACE, "◯ ... 2");
         } else {
             key_2.release();
         }
@@ -360,7 +369,7 @@ Debug.println(Level.FINER, "◯ ... 2");
 
         if (v) {
             key_5.press();
-Debug.println(Level.FINER, "△ ... 5");
+logger.log(Level.TRACE, "△ ... 5");
         } else {
             key_5.release();
         }
@@ -373,7 +382,7 @@ Debug.println(Level.FINER, "△ ... 5");
 
         if (v) {
             mouseKey_0.press();
-Debug.println(Level.FINER, "L1 ... Mouse Click 0");
+logger.log(Level.TRACE, "L1 ... Mouse Click 0");
         } else {
             mouseKey_0.release();
         }
@@ -386,7 +395,7 @@ Debug.println(Level.FINER, "L1 ... Mouse Click 0");
 
         if (v) {
             mouseKey_1.press();
-Debug.println(Level.FINER, "R1 ... Mouse Click 1");
+logger.log(Level.TRACE, "R1 ... Mouse Click 1");
         } else {
             mouseKey_1.release();
         }
@@ -399,7 +408,7 @@ Debug.println(Level.FINER, "R1 ... Mouse Click 1");
 
         if (v) {
             key_CONTROL.press();
-Debug.println(Level.FINER, "L2 ... Control Left");
+logger.log(Level.TRACE, "L2 ... Control Left");
         } else {
             key_CONTROL.release();
         }
@@ -412,7 +421,7 @@ Debug.println(Level.FINER, "L2 ... Control Left");
 
         if (v) {
             key_SHIFT.press();
-Debug.println(Level.FINER, "R2 ... Shift Left");
+logger.log(Level.TRACE, "R2 ... Shift Left");
         } else {
             key_SHIFT.release();
         }
@@ -425,7 +434,7 @@ Debug.println(Level.FINER, "R2 ... Shift Left");
 
         if (v) {
             key_ESCAPE.press();
-Debug.println(Level.FINER, "SHARE ... ESC");
+logger.log(Level.TRACE, "SHARE ... ESC");
         } else {
             key_ESCAPE.release();
         }
@@ -438,7 +447,7 @@ Debug.println(Level.FINER, "SHARE ... ESC");
 
         if (v) {
             key_Q.press();
-Debug.println(Level.FINER, "OPTIONS ... Q");
+logger.log(Level.TRACE, "OPTIONS ... Q");
         } else {
             key_Q.release();
         }
@@ -451,7 +460,7 @@ Debug.println(Level.FINER, "OPTIONS ... Q");
 
         if (v) {
             key_OPTION.press();
-Debug.println(Level.FINER, "L3 Button ... Option Left");
+logger.log(Level.TRACE, "L3 Button ... Option Left");
         } else {
             key_OPTION.release();
         }
@@ -464,7 +473,7 @@ Debug.println(Level.FINER, "L3 Button ... Option Left");
 
         if (v) {
             key_F5.press();
-Debug.println(Level.FINER, "R3 Button ... F5");
+logger.log(Level.TRACE, "R3 Button ... F5");
         } else {
             key_F5.release();
         }
@@ -477,7 +486,7 @@ Debug.println(Level.FINER, "R3 Button ... F5");
 
         if (v) {
             key_F3.press();
-Debug.println(Level.FINER, "PS ... F3");
+logger.log(Level.TRACE, "PS ... F3");
         } else {
             key_F3.release();
         }
@@ -490,15 +499,23 @@ Debug.println(Level.FINER, "PS ... F3");
 
         if (v) {
             key_E.press();
-Debug.println(Level.FINER, "PAD: ... E");
+logger.log(Level.TRACE, "PAD: ... E");
         } else {
             key_E.release();
+        }
+    }
+
+    private static void touch() {
+        vavi.apps.hub.Context hubContext = vavi.apps.hub.Context.getInstance();
+        if (hubContext != null) {
+            hubContext.touch();
         }
     }
 
     @Override
     public void after() {
         if (moved) {
+            touch();
             robot.mouseMoveOnlyAccel(dx, dy);
             normalizePoint();
             robot.mouseMoveOnlyLocation(point.x, point.y);
