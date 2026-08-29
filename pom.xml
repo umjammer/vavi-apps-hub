@@ -81,7 +81,7 @@
                     <vmArg>java.desktop/com.apple.eawt=ALL-UNNAMED</vmArg>
                     <vmArg>--add-opens</vmArg>
                     <vmArg>java.base/java.lang=ALL-UNNAMED</vmArg>
-                    <vmArg>-Djna.library.path=/usr/local/lib:.</vmArg>
+                    <vmArg>-Djna.library.path=/opt/homebrew/lib:/usr/local/lib:.</vmArg>
                     <vmArg>-Dapple.laf.useScreenMenuBar=true</vmArg>
                     <vmArg>-Djava.util.logging.config.file=./logging.properties</vmArg>
                   </vmArgs>

@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
         "java.desktop/com.apple.eawt=ALL-UNNAMED",
         "--add-opens",
         "java.base/java.lang=ALL-UNNAMED",
-        "-Djna.library.path=/usr/local/lib:.",
+        "-Djna.library.path=/opt/homebrew/lib:/usr/local/lib:.",
         "-Dapple.laf.useScreenMenuBar=true",
         "-Djava.util.logging.config.file=./logging.properties",
         "vavi.apps.hub.Main"

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.util.NoSuchElementException;
 
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.ControllerEvent;
@@ -59,17 +60,13 @@ public class Gamepad implements Plugin {
 
             String name = "vavi.games.input.hid4java";
             HidControllerEnvironment environment = (HidControllerEnvironment) ControllerEnvironment.getEnvironmentByName(name);
-            HidController controller = environment.getController(vendorId, productId);
-logger.log(Level.INFO, controller);
-
-            openController(context, controller);
 
             environment.addControllerListener(new ControllerListener() {
                 @Override
                 public void controllerRemoved(ControllerEvent ev) {
                     if (ev.getController() instanceof HidController hidController) {
                         if (hidController.getVendorId() == vendorId && hidController.getProductId() == productId) {
-                            logger.log(Level.INFO, "the controller is disconnected");
+                            logger.log(Level.INFO, "the controller %s:%s is disconnected".formatted(vendorId, productId));
                             context.fireEventHappened(new GenericEvent(this, "gamepad.listener.changed", (Object) null));
                         }
                     }
@@ -81,7 +78,7 @@ logger.log(Level.INFO, controller);
                         if (hidController.getVendorId() == vendorId && hidController.getProductId() == productId) {
                             try {
                                 openController(context, hidController);
-                                logger.log(Level.INFO, "the controller is reconnected");
+                                logger.log(Level.INFO, "the controller %s:%s is (re)connected".formatted(vendorId, productId));
                             } catch (IOException e) {
                                 throw new UncheckedIOException(e);
                             }
@@ -89,6 +86,14 @@ logger.log(Level.INFO, controller);
                     }
                 }
             });
+
+            try {
+                HidController controller = environment.getController(vendorId, productId);
+logger.log(Level.INFO, controller);
+                openController(context, controller);
+            } catch (NoSuchElementException e) {
+logger.log(Level.DEBUG, "gamepad not found initially: " + e.getMessage());
+            }
         } catch (Exception e) {
 logger.log(Level.ERROR, e.getMessage(), e);
             throw new IllegalStateException(e);
