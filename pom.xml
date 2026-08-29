@@ -137,12 +137,16 @@
                     </exec>
                     <chmod file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/MacOS/${javapackager.name}"
                            perm="755" />
-                    <!-- Ad-hoc codesign the bundle so macOS LaunchServices & ControlCenter trust the status item -->
+                    <!-- Ad-hoc codesign the bundle with stable designated requirement so macOS permissions persist across builds -->
                     <exec executable="codesign" failonerror="false">
                       <arg value="--force" />
                       <arg value="--deep" />
                       <arg value="--sign" />
                       <arg value="-" />
+                      <arg value="--identifier" />
+                      <arg value="${javapackager.name}" />
+                      <arg value="--requirements" />
+                      <arg value="=designated =&gt; identifier &quot;${javapackager.name}&quot;" />
                       <arg value="${project.build.directory}/${javapackager.name}/${javapackager.name}.app" />
                     </exec>
                   </target>
