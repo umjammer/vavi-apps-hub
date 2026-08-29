@@ -6,13 +6,18 @@
 
 package vavi.apps.hub;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerEvent;
+import net.java.games.input.ControllerListener;
 import net.java.games.input.usb.HidController;
 import net.java.games.input.usb.HidControllerEnvironment;
 import vavi.games.input.listener.GamepadInputEventListener;
+import vavi.util.event.GenericEvent;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
@@ -57,14 +62,44 @@ public class Gamepad implements Plugin {
             HidController controller = environment.getController(vendorId, productId);
 logger.log(Level.INFO, controller);
 
-            GamepadInputEventListener listener = new GamepadInputEventListener();
-            listener.addObserver(context::fireEventHappened);
-            controller.addInputEventListener(listener);
+            openController(context, controller);
 
-            controller.open();
+            environment.addControllerListener(new ControllerListener() {
+                @Override
+                public void controllerRemoved(ControllerEvent ev) {
+                    if (ev.getController() instanceof HidController hidController) {
+                        if (hidController.getVendorId() == vendorId && hidController.getProductId() == productId) {
+                            logger.log(Level.INFO, "the controller is disconnected");
+                            context.fireEventHappened(new GenericEvent(this, "gamepad.listener.changed", (Object) null));
+                        }
+                    }
+                }
+
+                @Override
+                public void controllerAdded(ControllerEvent ev) {
+                    if (ev.getController() instanceof HidController hidController) {
+                        if (hidController.getVendorId() == vendorId && hidController.getProductId() == productId) {
+                            try {
+                                openController(context, hidController);
+                                logger.log(Level.INFO, "the controller is reconnected");
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        }
+                    }
+                }
+            });
         } catch (Exception e) {
 logger.log(Level.ERROR, e.getMessage(), e);
             throw new IllegalStateException(e);
         }
+    }
+
+    private static void openController(Context context, HidController controller) throws IOException {
+        GamepadInputEventListener listener = new GamepadInputEventListener();
+        listener.addObserver(context::fireEventHappened);
+        controller.addInputEventListener(listener);
+
+        controller.open();
     }
 }
