@@ -31,7 +31,7 @@ public class Main {
 
     /** */
     public static void main(String[] args) throws Exception {
-        System.setProperty("apple.awt.UIElement", "true"); // eliminate dock icon
+//        System.setProperty("apple.awt.UIElement", "true"); // eliminate dock icon (handled by Info.plist LSUIElement)
 
         Server server = null;
         try {

@@ -97,10 +97,55 @@
                       <string>${javapackager.name}</string>
                       <key>CFBundleShortVersionString</key>
                       <string>${git.build.time}</string>
+                      <key>LSUIElement</key>
+                      <true/>
                     ]]>
                       </additionalEntries>
                     </infoPlist>
                   </macConfig>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>patch-universal-java-application-stub</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Fix CFBundlePackageType from BNDL to APPL for standard macOS application -->
+                    <replace file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/Info.plist"
+                             token="&lt;string&gt;BNDL&lt;/string&gt;"
+                             value="&lt;string&gt;APPL&lt;/string&gt;" />
+                    <replace file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/Info.plist"
+                             token="&lt;string&gt;universalJavaApplicationStub&lt;/string&gt;"
+                             value="&lt;string&gt;${javapackager.name}&lt;/string&gt;" />
+                    <!-- Build native Mach-O launcher to prevent RunningBoard PID mismatch & ControlCenter rejection on modern macOS -->
+                    <exec executable="clang" failonerror="true">
+                      <arg value="-arch" />
+                      <arg value="arm64" />
+                      <arg value="-o" />
+                      <arg value="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/MacOS/${javapackager.name}" />
+                      <arg value="${project.basedir}/src/main/native/launcher.c" />
+                    </exec>
+                    <chmod file="${project.build.directory}/${javapackager.name}/${javapackager.name}.app/Contents/MacOS/${javapackager.name}"
+                           perm="755" />
+                    <!-- Ad-hoc codesign the bundle so macOS LaunchServices & ControlCenter trust the status item -->
+                    <exec executable="codesign" failonerror="false">
+                      <arg value="--force" />
+                      <arg value="--deep" />
+                      <arg value="--sign" />
+                      <arg value="-" />
+                      <arg value="${project.build.directory}/${javapackager.name}/${javapackager.name}.app" />
+                    </exec>
+                  </target>
                 </configuration>
               </execution>
             </executions>
