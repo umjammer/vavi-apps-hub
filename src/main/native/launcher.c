@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <mach-o/dyld.h>
 #include <limits.h>
+#include <dirent.h>
 
 typedef int (*JLI_Launch_t)(int argc, char ** argv,
                             int jargc, const char** jargv,
@@ -39,6 +40,38 @@ static int get_java_home(char *out, size_t maxlen) {
     return -1;
 }
 
+static int find_jar_path(const char *java_dir, char *out_jar_path, size_t maxlen) {
+    DIR *dir = opendir(java_dir);
+    if (!dir) return -1;
+
+    struct dirent *entry;
+    char candidate[PATH_MAX] = {0};
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_name[0] == '.') continue;
+        size_t name_len = strlen(entry->d_name);
+        if (name_len > 4 && strcmp(entry->d_name + name_len - 4, ".jar") == 0) {
+            // Prioritize *-runnable.jar if present
+            if (strstr(entry->d_name, "-runnable.jar") != NULL) {
+                snprintf(out_jar_path, maxlen, "%s/%s", java_dir, entry->d_name);
+                closedir(dir);
+                return 0;
+            }
+            if (candidate[0] == '\0') {
+                snprintf(candidate, sizeof(candidate), "%s/%s", java_dir, entry->d_name);
+            }
+        }
+    }
+    closedir(dir);
+
+    if (candidate[0] != '\0') {
+        strncpy(out_jar_path, candidate, maxlen - 1);
+        out_jar_path[maxlen - 1] = '\0';
+        return 0;
+    }
+    return -1;
+}
+
 int main(int argc, char *argv[]) {
     char exe_path[PATH_MAX];
     uint32_t size = sizeof(exe_path);
@@ -65,7 +98,11 @@ int main(int argc, char *argv[]) {
     snprintf(jli_path, sizeof(jli_path), "%s/lib/libjli.dylib", java_home);
     void *lib = dlopen(jli_path, RTLD_NOW | RTLD_GLOBAL);
     if (!lib) {
-        fprintf(stderr, "dlopen failed for %s: %s\n", jli_path, dlerror());
+        snprintf(jli_path, sizeof(jli_path), "%s/lib/jli/libjli.dylib", java_home);
+        lib = dlopen(jli_path, RTLD_NOW | RTLD_GLOBAL);
+    }
+    if (!lib) {
+        fprintf(stderr, "dlopen failed for libjli.dylib: %s\n", dlerror());
         return 1;
     }
     
@@ -75,10 +112,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
+    char java_dir[PATH_MAX];
+    snprintf(java_dir, sizeof(java_dir), "%s/Contents/Resources/Java", bundle_path);
     char jar_path[PATH_MAX];
-    snprintf(jar_path, sizeof(jar_path), "%s/Contents/Resources/Java/vavi-apps-hub-0.0.6-SNAPSHOT-runnable.jar", bundle_path);
+    if (find_jar_path(java_dir, jar_path, sizeof(jar_path)) != 0) {
+        fprintf(stderr, "Cannot find runnable JAR in %s\n", java_dir);
+        return 1;
+    }
     
-    const char *java_args[] = {
+    const char *base_args[] = {
         exe_path,
         "-cp",
         jar_path,
@@ -91,7 +133,19 @@ int main(int argc, char *argv[]) {
         "-Djava.util.logging.config.file=./logging.properties",
         "vavi.apps.hub.Main"
     };
-    int num_args = sizeof(java_args) / sizeof(java_args[0]);
+    int base_count = sizeof(base_args) / sizeof(base_args[0]);
+    int extra_count = (argc > 1) ? (argc - 1) : 0;
+    int total_args = base_count + extra_count;
+
+    const char **java_args = (const char **)malloc(sizeof(char *) * total_args);
+    if (!java_args) return 1;
+
+    for (int i = 0; i < base_count; i++) {
+        java_args[i] = base_args[i];
+    }
+    for (int i = 0; i < extra_count; i++) {
+        java_args[base_count + i] = argv[1 + i];
+    }
     
-    return jli_launch(num_args, (char **)java_args, 0, NULL, 0, NULL, "", "", "java", "java", 0, 0, 0, 0);
+    return jli_launch(total_args, (char **)java_args, 0, NULL, 0, NULL, "", "", "java", "java", 0, 0, 0, 0);
 }
