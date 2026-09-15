@@ -131,6 +131,8 @@ int main(int argc, char *argv[]) {
         "-Djna.library.path=/opt/homebrew/lib:/usr/local/lib:.",
         "-Dapple.laf.useScreenMenuBar=true",
         "-Djava.util.logging.config.file=./logging.properties",
+        // keep in sync with vmArgs of javapackager in pom.xml, Info.plist VMOptions are not used by this launcher
+        "-Dvavi.games.input.hid4java.usages=0x01:0x05,0x01:0x06",
         "vavi.apps.hub.Main"
     };
     int base_count = sizeof(base_args) / sizeof(base_args[0]);
