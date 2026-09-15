@@ -15,6 +15,7 @@
  * remote trackpad (wip)
  * 🏅 gamepad binder (Minecraft, MuseScore3)
  * hand gesture recognizer (tbd)
+ * mini keyboard controller (hosting AU change instrument)
 
 ## Install
 
