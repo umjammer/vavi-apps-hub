@@ -131,21 +131,28 @@ public class MinecraftListener extends GamepadAdapter {
     private final AtomicReference<Rectangle> bounds = new AtomicReference<>();
 
     /**
+     * the cursor moved by the gamepad is kept this pixels inside of edges,
+     * not to fire screen edge/corner features (e.g. hot corners) when the window is full screen.
+     */
+    private static final int edgeMargin = Integer.getInteger("vavi.games.input.listener.minecraft.edgeMargin", 8);
+
+    /**
      * @after {@link #point}
      */
     private void normalizePoint() {
         Rectangle b = bounds.get();
         if (b != null) {
-            if (point.x < b.x) point.x = b.x;
-            if (point.x > b.x + b.width) point.x = b.x + b.width - 1;
-            if (point.y < b.y) point.y = b.y;
-            if (point.y > b.y + b.height) point.y = b.y + b.height - 1;
+            clampPoint(b.x, b.y, b.width, b.height);
         } else {
-            if (point.x < 0) point.x = 0;
-            if (point.x > dm.getWidth()) point.x = dm.getWidth() - 1;
-            if (point.y < 0) point.y = 0;
-            if (point.y > dm.getHeight()) point.y = dm.getHeight() - 1;
+            clampPoint(0, 0, dm.getWidth(), dm.getHeight());
         }
+    }
+
+    /** clamps {@link #point} into the area shrunk by {@link #edgeMargin} */
+    private void clampPoint(int x, int y, int width, int height) {
+        int m = Math.max(0, Math.min(edgeMargin, Math.min(width, height) / 2 - 1));
+        point.x = Math.max(x + m, Math.min(point.x, x + width - 1 - m));
+        point.y = Math.max(y + m, Math.min(point.y, y + height - 1 - m));
     }
 
     class RobotKey extends Key {
