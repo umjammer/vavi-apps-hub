@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -84,6 +84,7 @@
                     <vmArg>-Djna.library.path=/opt/homebrew/lib:/usr/local/lib:.</vmArg>
                     <vmArg>-Dapple.laf.useScreenMenuBar=true</vmArg>
                     <vmArg>-Djava.util.logging.config.file=./logging.properties</vmArg>
+                    <vmArg>-Dvavi.games.input.hid4java.usages=0x01:0x05,0x01:0x06</vmArg>
                   </vmArgs>
 
                   <macConfig>
@@ -176,6 +177,7 @@
         <configuration>
           <argLine>
             -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
+            -Dvavi.games.input.hid4java.usages=0x01:0x05,0x01:0x06
           </argLine>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
@@ -220,14 +222,25 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.20</version>
+      <version>1.1.23</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-awt-joystick</artifactId>
-      <version>0.0.14</version>
+      <version>0.0.15</version>
+<exclusions>
+  <exclusion>
+    <groupId>com.github.umjammer</groupId>
+    <artifactId>hid4java</artifactId>
+  </exclusion>
+</exclusions>
     </dependency>
+<dependency>
+  <groupId>com.github.umjammer</groupId> <!-- org.hid4java / com.github.umjammer -->
+  <artifactId>hid4java</artifactId>
+  <version>0.14.13v</version>
+</dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>

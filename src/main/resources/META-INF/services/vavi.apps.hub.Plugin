@@ -1,2 +1,3 @@
-vavi.apps.hub.Tray
-vavi.apps.hub.Gamepad
+vavi.apps.hub.plugin.Tray
+vavi.apps.hub.plugin.Gamepad
+vavi.apps.hub.plugin.MiniKeyboard

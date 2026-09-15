@@ -4,10 +4,9 @@
  * Programmed by Naohide Sano
  */
 
-package vavi.apps.hub;
+package vavi.apps.hub.plugin;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.NoSuchElementException;
@@ -17,6 +16,8 @@ import net.java.games.input.ControllerEvent;
 import net.java.games.input.ControllerListener;
 import net.java.games.input.usb.HidController;
 import net.java.games.input.usb.HidControllerEnvironment;
+import vavi.apps.hub.Context;
+import vavi.apps.hub.Plugin;
 import vavi.games.input.listener.GamepadInputEventListener;
 import vavi.util.event.GenericEvent;
 import vavi.util.properties.annotation.Property;
