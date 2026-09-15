@@ -4,7 +4,7 @@
  * Programmed by Naohide Sano
  */
 
-package vavi.apps.hub;
+package vavi.apps.hub.plugin;
 
 import java.awt.AWTException;
 import java.awt.EventQueue;
@@ -18,6 +18,8 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import javax.imageio.ImageIO;
 
+import vavi.apps.hub.Context;
+import vavi.apps.hub.Plugin;
 import vavi.util.event.GenericEvent;
 
 
