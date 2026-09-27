@@ -132,6 +132,7 @@ int main(int argc, char *argv[]) {
         "-Dapple.laf.useScreenMenuBar=true",
         "-Djava.util.logging.config.file=./logging.properties",
         // keep in sync with vmArgs of javapackager in pom.xml, Info.plist VMOptions are not used by this launcher
+        "-Dvavi.games.input.hid4java.darwinOpenDevicesNonExclusive=true",
         "-Dvavi.games.input.hid4java.usages=0x01:0x05,0x01:0x06",
         "vavi.apps.hub.Main"
     };

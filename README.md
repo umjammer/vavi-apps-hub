@@ -35,8 +35,6 @@ Hub.app
    - Accessibility: Click + and add Hub.app (ensure the toggle is ON).
    - Input Monitoring: Click + and add Hub.app (ensure the toggle is ON).
 
-⚠️ mandatory: you need to do above every time after building this app
-
 ## Usage
 
 ### server

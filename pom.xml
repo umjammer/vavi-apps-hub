@@ -5,7 +5,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-apps-hub</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.9</version>
 
   <properties>
     <javapackager.name>Hub</javapackager.name>
@@ -239,7 +239,7 @@
 <dependency>
   <groupId>com.github.umjammer</groupId> <!-- org.hid4java / com.github.umjammer -->
   <artifactId>hid4java</artifactId>
-  <version>0.14.13v</version>
+  <version>0.14.14v</version>
 </dependency>
 
     <dependency>
