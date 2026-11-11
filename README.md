@@ -13,6 +13,7 @@
 
  * remote notificator
  * remote trackpad (wip)
+ * ✏️ iPad + Apple Pencil tablet emulator (pressure, tilt) for GIMP, Photoshop, etc.
  * 🏅 gamepad binder (Minecraft, MuseScore3)
  * hand gesture recognizer (tbd)
  * mini keyboard controller (hosting AU change instrument)
@@ -57,6 +58,15 @@ Hub.app
 
  * accsess `http://localhost:60080/`
 
+#### tablet emulator (iPad + Apple Pencil)
+
+ * open `http://your_mac.local:60080/tablet.html` with Safari on the iPad (same LAN), "Add to Home Screen" for full screen
+ * the pen is posted as a macOS tablet device (pressure, tilt) system wide, no app plugin needed
+   * GIMP: Edit → Input Devices → set the pen device mode to "Screen", use "Dynamics" (e.g. Pressure Size) on brushes
+   * Photoshop: enable pen pressure on brush settings
+ * the whole iPad surface maps to the main screen (aspect kept), change it by `-Dvavi.apps.hub.tablet.area=x,y,w,h` (points), `-Dvavi.apps.hub.tablet.keepAspect=false`
+ * toolbar: pressure curve, `R-click` (next stroke is a right button), `finger` (accept finger too), `ink` (local preview)
+
 #### gamepad binder
 
 * let Minecraft or MuseScore3 most front
@@ -76,6 +86,7 @@ Hub.app
    * jetty
  * apple pencil
    * https://github.com/shuding/apple-pencil-safari-api-test
+   * CGEventTypes.h (kCGEventMouseSubtypeTabletPoint, kCGEventTabletProximity)
 
 ## TODO
 
