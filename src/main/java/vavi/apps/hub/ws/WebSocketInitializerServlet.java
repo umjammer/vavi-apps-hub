@@ -20,6 +20,7 @@ public class WebSocketInitializerServlet extends HttpServlet {
 
             // Simple registration of your WebSocket endpoints.
             container.addEndpoint(RemotePointingServer.class);
+            container.addEndpoint(TabletServer.class);
 
         } catch (DeploymentException x) {
             throw new ServletException(x);
