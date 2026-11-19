@@ -62,7 +62,7 @@
                   <organizationName>Copyright © 2023 by vavi, All rights reserved.</organizationName>
 
                   <mainClass>vavi.apps.hub.Main</mainClass>
-                  <runnableJar>${project.artifactId}-${project.version}.jar</runnableJar>
+                  <!-- runnableJar is omitted so javapackager generates a runnable jar with manifest classpath for dependencies in libs/ -->
                   <generateInstaller>${installer}</generateInstaller>
                   <bundleJre>false</bundleJre>
                   <jreMinVersion>17</jreMinVersion>
@@ -211,7 +211,7 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-bom</artifactId>
-        <version>12.1.14</version>
+        <version>12.1.15</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -257,28 +257,8 @@
     <dependency>
       <groupId>org.eclipse.jetty.ee10.websocket</groupId>
       <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
-      <version>12.1.14</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm-commons</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>12.1.15</version>
     </dependency>
-<dependency>
-  <groupId>org.ow2.asm</groupId>
-  <artifactId>asm</artifactId>
-  <version>9.11.1</version>
-</dependency>
-<dependency>
-  <groupId>org.ow2.asm</groupId>
-  <artifactId>asm-commons</artifactId>
-  <version>9.11.1</version>
-</dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId> <!-- even patch version update, jetty changes api -->
@@ -315,13 +295,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.formdev</groupId>
-      <artifactId>flatlaf</artifactId>
-      <version>3.7.2</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-script-apple</artifactId>
       <version>1.2.2</version>
@@ -334,14 +307,23 @@
     </dependency>
 
     <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>3.8</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
       <version>2.0.20</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-util-logging-asl</artifactId>
       <version>0.0.3</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
